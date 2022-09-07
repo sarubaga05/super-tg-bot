@@ -28,4 +28,12 @@ def values(message):
     bot.reply_to(message, text)
 
 
+@bot.message_handler(content_types=['text'])
+def converter(message):
+    base, quote, amount = message.text.split(' ')
+    result = GetCurrency.get_price(base, quote, amount)
+    text = f'Цена {amount} {base} в {quote} = {result}'
+    bot.send_message(message.chat.id, text)
+
+
 bot.polling(none_stop=True)
