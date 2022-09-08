@@ -23,16 +23,22 @@ def values(message):
 
 @bot.message_handler(content_types=['text'])
 def converter(message):
-    your_msg = message.text.split(' ')
+    try:
+        your_msg = message.text.split(' ')
 
-    if len(your_msg) != 3:
-        raise ConvException('Введено неверное количество параметров.')
+        if len(your_msg) != 3:
+            raise ConvException('Введено неверное количество параметров.')
 
-    base, quote, amount = your_msg
+        base, quote, amount = your_msg
 
-    result = GetCurrency.get_price(base, quote, amount)
-    text = f'Цена {amount} {base} в {quote} = {result}'
-    bot.send_message(message.chat.id, text)
+        result = GetCurrency.get_price(base, quote, amount)
+    except ConvException as e:
+        bot.reply_to(message, f'Ошибка.\n{e}')
+    except Exception as e:
+        bot.reply_to(message, f'Ошибка обработки команды.\n{e}')
+    else:
+        text = f'Цена {amount} {base.lower()} в {quote.lower()} = {result}'
+        bot.send_message(message.chat.id, text)
 
 
-bot.polling(none_stop=True)
+bot.polling()
