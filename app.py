@@ -1,15 +1,8 @@
-import requests
 import telebot
-import json
-from tkn import TOKEN
-from exten import *
+from tkn import currency, TOKEN
+from exten import ConvException, GetCurrency
 
 bot = telebot.TeleBot(TOKEN)
-currency = {
-    'Доллар': 'USD',
-    'Евро': 'EUR',
-    'Рубль': 'RUB'
-}
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -30,7 +23,13 @@ def values(message):
 
 @bot.message_handler(content_types=['text'])
 def converter(message):
-    base, quote, amount = message.text.split(' ')
+    your_msg = message.text.split(' ')
+
+    if len(your_msg) != 3:
+        raise ConvException('Введено неверное количество параметров.')
+
+    base, quote, amount = your_msg
+
     result = GetCurrency.get_price(base, quote, amount)
     text = f'Цена {amount} {base} в {quote} = {result}'
     bot.send_message(message.chat.id, text)
